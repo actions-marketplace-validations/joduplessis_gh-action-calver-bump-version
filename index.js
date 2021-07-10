@@ -117,7 +117,7 @@ Toolkit.run(async (tools) => {
     await tools.runInWorkspace('git', [
       'config',
       'user.email',
-      `"${process.env.GITHUB_EMAIL || 'gh-action-bump-version@users.noreply.github.com'}"`,
+      `"${process.env.GITHUB_EMAIL || 'gh-action-calver-bump-version@users.noreply.github.com'}"`,
     ]);
 
     let currentBranch = /refs\/[a-zA-Z]+\/(.*)/.exec(process.env.GITHUB_REF)[1];
