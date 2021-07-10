@@ -13,12 +13,15 @@ Toolkit.run(async (tools) => {
         const pkg = tools.getPackageJSON()
         const tagPrefix = process.env['INPUT_TAG-PREFIX'] || ''
         const commitMessage = process.env['INPUT_COMMIT-MESSAGE'] || 'ci: version bump to {{version}}'
+
         const current = pkg.version.toString()
         const currentVersionParts = current.split('-')
         const calVersion = currentVersionParts[0]
         const patchVersion = currentVersionParts[1]
         const bumpedPatchVersion = patchVersion ? Number(patchVersion) + 1 : 0
         const newVersion = calVersion + '-' + bumpedPatchVersion
+        const version = newVersion
+
         let currentBranch = /refs\/[a-zA-Z]+\/(.*)/.exec(process.env.GITHUB_REF)[1]
         let isPullRequest = false
 
@@ -46,29 +49,39 @@ Toolkit.run(async (tools) => {
             currentBranch = process.env['INPUT_TARGET-BRANCH']
         }
 
-        const finalCommitMessage = `"${commitMessage.replace(/{{version}}/g, newVersion)}"`
 
-        await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
-        await tools.runInWorkspace('git', ['status'])
-        await tools.runInWorkspace('git', ['commit', '-m', '-v', finalCommitMessage])
+
+        
+
+        console.log('currentBranch:', currentBranch);
+        await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current]);
+        console.log('current:', current, '/', 'version:', version);
+        let newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
+        newVersion = `${tagPrefix}${newVersion}`;
+        await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, newVersion)]);
 
         // now go to the actual branch to perform the same versioning
         if (isPullRequest) {
             await tools.runInWorkspace('git', ['fetch'])
         }
-
-        await tools.runInWorkspace('git', ['checkout', currentBranch])
-        await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
-
+        await tools.runInWorkspace('git', ['checkout', currentBranch]);
+        await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current]);
+        console.log('current:', current, '/', 'version:', version);
+        newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
+        newVersion = `${tagPrefix}${newVersion}`;
+        console.log(`::set-output name=newTag::${newVersion}`);
         try {
-            // to support "actions/checkout@v1"
-            await tools.runInWorkspace('git', ['commit', '-m', '-v', finalCommitMessage])
+          // to support "actions/checkout@v1"
+          await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, newVersion)]);
         } catch (e) {
-            console.warn(
-                'git commit failed because you are using "actions/checkout@v2"; ' +
-                    'but that doesnt matter because you dont need that git commit, thats only for "actions/checkout@v1"'
-            )
+          console.warn(
+            'git commit failed because you are using "actions/checkout@v2"; ' +
+              'but that doesnt matter because you dont need that git commit, thats only for "actions/checkout@v1"',
+          );
         }
+
+
+
 
         const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`
 
