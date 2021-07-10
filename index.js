@@ -114,9 +114,9 @@ Toolkit.run(async (tools) => {
         const calVersion = currentVersionParts[0]
         const patchVersion = currentVersionParts[1]
         const bumpedPatchVersion = patchVersion ? Number(patchVersion) + 1 : 0
-        const newVersion = calVersion + '-' + bumpedPatchVersion
+        const newCalVersion = calVersion + '-' + bumpedPatchVersion
 
-        
+
         // set git user
         await tools.runInWorkspace('git', [
             'config',
