@@ -49,6 +49,7 @@ Toolkit.run(async (tools) => {
         const finalCommitMessage = `"${commitMessage.replace(/{{version}}/g, newVersion)}"`
 
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
+        await tools.runInWorkspace('git', ['status'])
         await tools.runInWorkspace('git', ['commit', '-m', '-v', finalCommitMessage])
 
         // now go to the actual branch to perform the same versioning
