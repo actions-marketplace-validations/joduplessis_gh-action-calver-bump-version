@@ -80,6 +80,7 @@ Toolkit.run(async (tools) => {
             await tools.runInWorkspace('git', ['push', remoteRepo])
         }
     } catch (e) {
+        console.log(e)
         tools.log.fatal(e)
         tools.exit.failure('Failed to bump version')
     }
