@@ -46,7 +46,7 @@ Toolkit.run(async (tools) => {
         }
 
         console.log('currentBranch:', currentBranch)
-        console.log('current:', current, '/', 'version:', version, '/', 'new version:', newVersion)
+        console.log('current:', current, '/', 'new version:', newVersion)
         console.log(commitMessage.replace(/{{version}}/g, newVersion))
 
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
@@ -60,9 +60,6 @@ Toolkit.run(async (tools) => {
         await tools.runInWorkspace('git', ['checkout', currentBranch])
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
 
-        console.log('current:', current, '/', 'version:', version)
-        console.log(`::set-output name=newTag::${newVersion}`)
-
         try {
             // to support "actions/checkout@v1"
             await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, newVersion)])
@@ -74,7 +71,7 @@ Toolkit.run(async (tools) => {
         }
 
         const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`
-        
+
         if (process.env['INPUT_SKIP-TAG'] !== 'true') {
             await tools.runInWorkspace('git', ['tag', tagPrefix + newVersion])
             await tools.runInWorkspace('git', ['push', remoteRepo, '--follow-tags'])
