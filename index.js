@@ -19,13 +19,11 @@ Toolkit.run(async (tools) => {
         const calVersion = `${today.getFullYear()}.${today.getMonth()}.${today.getDate()}`
         const patchVersion = currentVersionParts[1]
         const bumpedPatchVersion = patchVersion ? Number(patchVersion) + 1 : 0
-        const updatedVersion = calVersion + '-' + bumpedPatchVersion
-        const version = updatedVersion
-
+        const version = calVersion + '-' + bumpedPatchVersion
         let currentBranch = /refs\/[a-zA-Z]+\/(.*)/.exec(process.env.GITHUB_REF)[1]
         let isPullRequest = false
+        let newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
 
-        // set git user
         await tools.runInWorkspace('git', [
             'config',
             'user.name',
@@ -48,29 +46,30 @@ Toolkit.run(async (tools) => {
         }
 
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current]);
-        let newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
-        newVersion = `${tagPrefix}${newVersion}`;
-        await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, newVersion)]);
+        
+        //newVersion = `${tagPrefix}${newVersion}`;
+        await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, `${tagPrefix}${newVersion}`)]);
 
         // now go to the actual branch to perform the same versioning
         if (isPullRequest) {
             await tools.runInWorkspace('git', ['fetch'])
         }
+
         await tools.runInWorkspace('git', ['checkout', currentBranch]);
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current]);
-        newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
-        newVersion = `${tagPrefix}${newVersion}`;
+        //newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
+        //newVersion = `${tagPrefix}${newVersion}`;
         
         try {
           // to support "actions/checkout@v1"
-          await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, newVersion)]);
+          await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, `${tagPrefix}${newVersion}`)]);
         } catch (e) {
           console.warn(
             'git commit failed because you are using "actions/checkout@v2"; ' +
               'but that doesnt matter because you dont need that git commit, thats only for "actions/checkout@v1"',
           );
         }
-        
+
         const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`
 
         if (process.env['INPUT_SKIP-TAG'] !== 'true') {
@@ -81,7 +80,6 @@ Toolkit.run(async (tools) => {
             await tools.runInWorkspace('git', ['push', remoteRepo])
         }
     } catch (e) {
-        console.log(e)
         tools.log.fatal(e)
         tools.exit.failure('Failed to bump version')
     }
