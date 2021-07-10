@@ -46,8 +46,10 @@ Toolkit.run(async (tools) => {
             currentBranch = process.env['INPUT_TARGET-BRANCH']
         }
 
+        const finalCommitMessage = `"${commitMessage.replace(/{{version}}/g, newVersion)}"`
+
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
-        await tools.runInWorkspace('git', ['commit', '-m', '-v', commitMessage.replace(/{{version}}/g, newVersion)])
+        await tools.runInWorkspace('git', ['commit', '-m', '-v', finalCommitMessage])
 
         // now go to the actual branch to perform the same versioning
         if (isPullRequest) {
@@ -59,7 +61,7 @@ Toolkit.run(async (tools) => {
 
         try {
             // to support "actions/checkout@v1"
-            await tools.runInWorkspace('git', ['commit', '-m', '-v', commitMessage.replace(/{{version}}/g, newVersion)])
+            await tools.runInWorkspace('git', ['commit', '-m', '-v', finalCommitMessage])
         } catch (e) {
             console.warn(
                 'git commit failed because you are using "actions/checkout@v2"; ' +
