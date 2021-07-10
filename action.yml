@@ -11,6 +11,23 @@ inputs:
     description: 'Prefix that is used for the git tag'
     default: ''
     required: false
+  skip-tag:
+    description: 'Avoid to add a TAG to the version update commit'
+    default: 'false'
+    required: false
+  PACKAGEJSON_DIR:
+    description: 'Custom dir to the package'
+    default: ''
+    required: false
+  target-branch:
+    description: 'A separate branch to perform the version bump on'
+    default: ''
+    required: false
+  commit-message:
+    description: 'Set a custom commit message for version bump commit'
+    default: ''
+    required: false
+
   minor-wording:
     description: 'Words list that trigger a minor version bump'
     default: 'feat,minor'
@@ -26,18 +43,6 @@ inputs:
     description: 'Words list that trigger a rc version bump'
     default: 'pre-alpha,pre-beta,pre-rc'
     required: false
-  skip-tag:
-    description: 'Avoid to add a TAG to the version update commit'
-    default: 'false'
-    required: false
-  PACKAGEJSON_DIR:
-    description: 'Custom dir to the package'
-    default: ''
-    required: false
-  target-branch:
-    description: 'A separate branch to perform the version bump on'
-    default: ''
-    required: false
   default:
     description: 'Set a default version bump to use'
     default: 'patch'
@@ -46,10 +51,7 @@ inputs:
     description: 'Set a custom preid for prerelease build'
     default: 'rc'
     required: false
-  commit-message:
-    description: 'Set a custom commit message for version bump commit'
-    default: ''
-    required: false
+    
 outputs:
   newTag:
     description: 'The newly created tag'

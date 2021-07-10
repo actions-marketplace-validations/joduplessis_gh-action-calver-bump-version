@@ -44,41 +44,6 @@ Make sure you use the `actions/checkout@v2` action!
     skip-tag:  'true'
 ```
 
-**default:** Set a default version bump to use  (optional - defaults to patch). Example:
-```yaml
-- name:  'Automated Version Bump'
-  uses:  'joduplessis/gh-action-calver-bump-version@master'
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  with:
-    default: prerelease
-```
-
-**preid:** Set a preid value will building prerelease version  (optional - defaults to 'rc'). Example:
-```yaml
-- name:  'Automated Version Bump'
-  uses:  'joduplessis/gh-action-calver-bump-version@master'
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  with:
-    default: prerelease
-    preid: 'prc'
-```
-
-**wording:** Customize the messages that trigger the version bump. It must be a string, case sensitive, coma separated  (optional). Example:
-```yaml
-- name:  'Automated Version Bump'
-  uses:  'joduplessis/gh-action-calver-bump-version@master'
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  with:
-    minor-wording:  'add,Adds,new'
-    major-wording:  'MAJOR,cut-major'
-    patch-wording:  'patch,fixes'     # Providing patch-wording will override commits
-                                      # defaulting to a patch bump.
-    rc-wording:     'RELEASE,alpha'
-```
-
 **PACKAGEJSON_DIR:** Param to parse the location of the desired package.json (optional). Example:
 ```yaml
 - name:  'Automated Version Bump'

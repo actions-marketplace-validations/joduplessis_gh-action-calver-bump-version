@@ -16,7 +16,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./index.js",
-    "test": "jest"
+    "prettier:check": "prettier --check '*.js'",
+    "prettier": "prettier --write '*.js'",
+    "prettier:commit": "pretty-quick --staged --print-width 120"
   },
   "dependencies": {
     "actions-toolkit": "^2.2.0",
@@ -26,5 +28,10 @@
     "jest": "^25.2.7",
     "standard": "^14.3.3",
     "prettier": "^2.3.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged --print-width 120"
+    }
   }
 }
