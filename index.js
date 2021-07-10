@@ -19,13 +19,11 @@ Toolkit.run(async (tools) => {
         const calVersion = currentVersionParts[0]
         const patchVersion = currentVersionParts[1]
         const bumpedPatchVersion = patchVersion ? Number(patchVersion) + 1 : 0
-        const newVersion = calVersion + '-' + bumpedPatchVersion
-        const version = newVersion
+        const updatedVersion = calVersion + '-' + bumpedPatchVersion
+        const version = updatedVersion
 
         let currentBranch = /refs\/[a-zA-Z]+\/(.*)/.exec(process.env.GITHUB_REF)[1]
         let isPullRequest = false
-
-        console.log('current:', current, '/', 'new version:', newVersion)
 
         // set git user
         await tools.runInWorkspace('git', [
@@ -51,7 +49,7 @@ Toolkit.run(async (tools) => {
 
 
 
-        
+
 
         console.log('currentBranch:', currentBranch);
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current]);
