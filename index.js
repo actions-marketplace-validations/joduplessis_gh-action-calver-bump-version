@@ -9,105 +9,18 @@ if (process.env.PACKAGEJSON_DIR) {
 
 // Run your GitHub Action!
 Toolkit.run(async (tools) => {
-    const pkg = tools.getPackageJSON()
-    const event = tools.context.payload
-
-
-
-    if (!event.commits) {
-        console.log("Couldn't find any commits in this event, incrementing patch version...")
-    }
-
-    const tagPrefix = process.env['INPUT_TAG-PREFIX'] || ''
-    const messages = event.commits ? event.commits.map((commit) => commit.message + '\n' + commit.body) : []
-    const commitMessage = process.env['INPUT_COMMIT-MESSAGE'] || 'ci: version bump to {{version}}'
-    const commitMessageRegex = new RegExp(commitMessage.replace(/{{version}}/g, `${tagPrefix}\\d+\\.\\d+\\.\\d+`), 'ig')
-    const isVersionBump = messages.find((message) => commitMessageRegex.test(message)) !== undefined
-
-    if (isVersionBump) {
-        tools.exit.success('No action necessary because we found a previous bump!')
-        return
-    }
-
-    const majorWords = process.env['INPUT_MAJOR-WORDING'].split(',')
-    const minorWords = process.env['INPUT_MINOR-WORDING'].split(',')
-    const patchWords = process.env['INPUT_PATCH-WORDING'] ? process.env['INPUT_PATCH-WORDING'].split(',') : null
-    const preReleaseWords = process.env['INPUT_RC-WORDING'].split(',')
-
-    let version = process.env.INPUT_DEFAULT
-    let foundWord = null
-    let preid = process.env.INPUT_PREID
-
-    // case: if wording for MAJOR found
-    if (
-        messages.some(
-            (message) =>
-                /^([a-zA-Z]+)(\(.+\))?(\!)\:/.test(message) || majorWords.some((word) => message.includes(word))
-        )
-    ) {
-        version = 'major'
-    }
-    // case: if wording for MINOR found
-    else if (messages.some((message) => minorWords.some((word) => message.includes(word)))) {
-        version = 'minor'
-    }
-    // case: if wording for PATCH found
-    else if (patchWords && messages.some((message) => patchWords.some((word) => message.includes(word)))) {
-        version = 'patch'
-    }
-    // case: if wording for PRE-RELEASE found
-    else if (
-        messages.some((message) =>
-            preReleaseWords.some((word) => {
-                if (message.includes(word)) {
-                    foundWord = word
-                    return true
-                } else {
-                    return false
-                }
-            })
-        )
-    ) {
-        preid = foundWord.split('-')[1]
-        version = 'prerelease'
-    }
-
-    console.log('version action after first waterfall:', version)
-
-    // case: if default=prerelease,
-    // rc-wording is also set
-    // and does not include any of rc-wording
-    // then unset it and do not run
-    if (
-        version === 'prerelease' &&
-        preReleaseWords !== '' &&
-        !messages.some((message) => preReleaseWords.some((word) => message.includes(word)))
-    ) {
-        version = null
-    }
-
-    // case: if default=prerelease, but rc-wording is NOT set
-    if (version === 'prerelease' && preid) {
-        version = 'prerelease'
-        version = `${version} --preid=${preid}`
-    }
-
-    console.log('version action after final decision:', version)
-
-    // case: if nothing of the above matches
-    if (version === null) {
-        tools.exit.success('No version keywords found, skipping bump.')
-        return
-    }
-
-    // GIT logic
     try {
+        const pkg = tools.getPackageJSON()
+        const tagPrefix = process.env['INPUT_TAG-PREFIX'] || ''
+        const commitMessage = process.env['INPUT_COMMIT-MESSAGE'] || 'ci: version bump to {{version}}'    
         const current = pkg.version.toString()
         const currentVersionParts = current.split('-')
         const calVersion = currentVersionParts[0]
         const patchVersion = currentVersionParts[1]
         const bumpedPatchVersion = patchVersion ? Number(patchVersion) + 1 : 0
         const newVersion = calVersion + '-' + bumpedPatchVersion
+        let currentBranch = /refs\/[a-zA-Z]+\/(.*)/.exec(process.env.GITHUB_REF)[1]
+        let isPullRequest = false
 
         // set git user
         await tools.runInWorkspace('git', [
@@ -122,8 +35,7 @@ Toolkit.run(async (tools) => {
             `"${process.env.GITHUB_EMAIL || 'gh-action-calver-bump-version@users.noreply.github.com'}"`,
         ])
 
-        let currentBranch = /refs\/[a-zA-Z]+\/(.*)/.exec(process.env.GITHUB_REF)[1]
-        let isPullRequest = false
+        
         if (process.env.GITHUB_HEAD_REF) {
             currentBranch = process.env.GITHUB_HEAD_REF
             isPullRequest = true
@@ -134,20 +46,23 @@ Toolkit.run(async (tools) => {
         }
 
         console.log('currentBranch:', currentBranch)
-        await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
         console.log('current:', current, '/', 'version:', version, '/', 'new version:', newVersion)
         console.log(commitMessage.replace(/{{version}}/g, newVersion))
+
+        await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
         await tools.runInWorkspace('git', ['commit', '-a', '-m', '"test commit"'])
 
         // now go to the actual branch to perform the same versioning
         if (isPullRequest) {
-            // First fetch to get updated local version of branch
             await tools.runInWorkspace('git', ['fetch'])
         }
+
         await tools.runInWorkspace('git', ['checkout', currentBranch])
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
+
         console.log('current:', current, '/', 'version:', version)
         console.log(`::set-output name=newTag::${newVersion}`)
+
         try {
             // to support "actions/checkout@v1"
             await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, newVersion)])
@@ -159,8 +74,9 @@ Toolkit.run(async (tools) => {
         }
 
         const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`
+        
         if (process.env['INPUT_SKIP-TAG'] !== 'true') {
-            await tools.runInWorkspace('git', ['tag', newVersion])
+            await tools.runInWorkspace('git', ['tag', tagPrefix + newVersion])
             await tools.runInWorkspace('git', ['push', remoteRepo, '--follow-tags'])
             await tools.runInWorkspace('git', ['push', remoteRepo, '--tags'])
         } else {
