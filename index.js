@@ -135,9 +135,9 @@ Toolkit.run(async (tools) => {
 
         console.log('currentBranch:', currentBranch)
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current])
-        console.log('current:', current, '/', 'version:', version)
-        
-        await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, newVersion)])
+        console.log('current:', current, '/', 'version:', version, '/', 'new version:', newVersion)
+        console.log(commitMessage.replace(/{{version}}/g, newVersion))
+        await tools.runInWorkspace('git', ['commit', '-a', '-m', 'test commit'])
 
         // now go to the actual branch to perform the same versioning
         if (isPullRequest) {
