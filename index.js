@@ -102,8 +102,8 @@ Toolkit.run(async (tools) => {
 
     // GIT logic
     try {
-        const currentVersion = pkg.version.toString()
-        const currentVersionParts = currentVersion.split('-')
+        const current = pkg.version.toString()
+        const currentVersionParts = current.split('-')
         const calVersion = currentVersionParts[0]
         const patchVersion = currentVersionParts[1]
         const bumpedPatchVersion = patchVersion ? Number(patchVersion) + 1 : 0
