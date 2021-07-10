@@ -22,7 +22,6 @@ Toolkit.run(async (tools) => {
         const version = calVersion + '-' + bumpedPatchVersion
         let currentBranch = /refs\/[a-zA-Z]+\/(.*)/.exec(process.env.GITHUB_REF)[1]
         let isPullRequest = false
-        let newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
 
         await tools.runInWorkspace('git', [
             'config',
@@ -46,8 +45,8 @@ Toolkit.run(async (tools) => {
         }
 
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current]);
+        let newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
         
-        //newVersion = `${tagPrefix}${newVersion}`;
         await tools.runInWorkspace('git', ['commit', '-a', '-m', commitMessage.replace(/{{version}}/g, `${tagPrefix}${newVersion}`)]);
 
         // now go to the actual branch to perform the same versioning
@@ -57,8 +56,7 @@ Toolkit.run(async (tools) => {
 
         await tools.runInWorkspace('git', ['checkout', currentBranch]);
         await tools.runInWorkspace('npm', ['version', '--allow-same-version=true', '--git-tag-version=false', current]);
-        //newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
-        //newVersion = `${tagPrefix}${newVersion}`;
+        newVersion = execSync(`npm version --git-tag-version=false ${version}`).toString().trim().replace(/^v/, '');
         
         try {
           // to support "actions/checkout@v1"
