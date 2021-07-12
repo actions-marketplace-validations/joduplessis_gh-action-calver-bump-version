@@ -1,6 +1,6 @@
 {
   "name": "gh-action-calver-bump-version",
-  "version": "2021.6.12-5",
+  "version": "2021.6.12-6",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/joduplessis/gh-action-calver-bump-version.git"
