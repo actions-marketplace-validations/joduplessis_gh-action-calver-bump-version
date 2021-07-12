@@ -4,7 +4,7 @@ runs:
   using: docker
   image: Dockerfile
 branding:
-  icon: chevron-up
+  icon: calendar
   color: blue
 inputs:
   tag-prefix:
