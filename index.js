@@ -3,7 +3,6 @@ const { Toolkit } = require('actions-toolkit')
 
 // Based off of the excellent https://github.com/phips28/gh-action-bump-version
 
-// Change directory location if needed
 if (process.env.PACKAGEJSON_DIR) {
     process.env.GITHUB_WORKSPACE = `${process.env.GITHUB_WORKSPACE}/${process.env.PACKAGEJSON_DIR}`
     process.chdir(process.env.GITHUB_WORKSPACE)
