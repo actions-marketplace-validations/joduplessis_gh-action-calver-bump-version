@@ -1,7 +1,7 @@
 FROM node:15.12.0-slim
 
-LABEL "com.github.actions.name"="Automated Calver version bump for npm packages."
-LABEL "com.github.actions.description"="Automated Calver version bump for npm packages."
+LABEL "com.github.actions.name"="Automated NPM CalVer version bump"
+LABEL "com.github.actions.description"="GitHub Action for automated CalVer version bumps for NPM."
 LABEL "com.github.actions.icon"="chevron-up"
 LABEL "com.github.actions.color"="blue"
 

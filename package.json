@@ -1,17 +1,17 @@
 {
   "name": "gh-action-calver-bump-version",
-  "version": "2021.6.10-2",
+  "version": "2021.6.12-4",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/phips28/gh-action-calver-bump-version.git"
+    "url": "git+https://github.com/joduplessis/gh-action-calver-bump-version.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/phips28/gh-action-calver-bump-version/issues"
+    "url": "https://github.com/joduplessis/gh-action-calver-bump-version/issues"
   },
-  "homepage": "https://github.com/phips28/gh-action-calver-bump-version#readme",
+  "homepage": "https://github.com/joduplessis/gh-action-calver-bump-version#readme",
   "private": true,
   "main": "index.js",
   "scripts": {

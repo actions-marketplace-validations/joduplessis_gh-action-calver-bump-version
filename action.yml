@@ -1,5 +1,5 @@
-name: Automated Version Bump
-description: Automated version bump for npm packages.
+name: Automated NPM CalVer version bump
+description: GitHub Action for automated CalVer version bumps for NPM.
 runs:
   using: docker
   image: Dockerfile
@@ -8,25 +8,25 @@ branding:
   color: blue
 inputs:
   tag-prefix:
-    description: 'Prefix that is used for the git tag'
+    description: 'Git tag prefix'
     default: ''
     required: false
   skip-tag:
-    description: 'Avoid to add a TAG to the version update commit'
+    description: 'Skip Git tagging'
     default: 'false'
     required: false
   PACKAGEJSON_DIR:
-    description: 'Custom dir to the package'
+    description: 'Custom package.json location'
     default: ''
     required: false
   target-branch:
-    description: 'A separate branch to perform the version bump on'
+    description: 'Target branch for version bump'
     default: ''
     required: false
   commit-message:
-    description: 'Set a custom commit message for version bump commit'
+    description: 'Custom git commit message'
     default: ''
-    required: false    
+    required: false
 outputs:
   newTag:
-    description: 'The newly created tag'
+    description: 'Bumped version tag'
