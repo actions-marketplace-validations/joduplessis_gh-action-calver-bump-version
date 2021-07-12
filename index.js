@@ -20,7 +20,7 @@ Toolkit.run(async (tools) => {
         const currentVersionParts = current.split('-')
         const currentCalVersion = currentVersionParts[0]
         const patchVersion = currentVersionParts[1]
-        const calVersion = `${today.getFullYear()}.${today.getMonth()}.${today.getDate()}`
+        const calVersion = `${today.getFullYear()}.${today.getMonth()}.${today.getDate()}`.substring(2)
         const bumpedPatchVersion = !patchVersion || (calVersion != currentCalVersion) ? 0 :  Number(patchVersion) + 1
         const version = calVersion + '-' + bumpedPatchVersion
         let currentBranch = /refs\/[a-zA-Z]+\/(.*)/.exec(process.env.GITHUB_REF)[1]
