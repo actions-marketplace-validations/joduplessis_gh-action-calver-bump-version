@@ -1,8 +1,7 @@
 const { execSync } = require('child_process')
 const { Toolkit } = require('actions-toolkit')
 
-// Based off of the excellent https://github.com/phips28/gh-action-bump-version
-
+// Change directory location if needed
 if (process.env.PACKAGEJSON_DIR) {
     process.env.GITHUB_WORKSPACE = `${process.env.GITHUB_WORKSPACE}/${process.env.PACKAGEJSON_DIR}`
     process.chdir(process.env.GITHUB_WORKSPACE)
@@ -19,7 +18,7 @@ Toolkit.run(async (tools) => {
         const currentVersionParts = current.split('-')
         const currentCalVersion = currentVersionParts[0]
         const patchVersion = currentVersionParts[1]
-        const calVersion = `${today.getFullYear()}.${today.getMonth()}.${today.getDate()}`.substring(2)
+        const calVersion = `${today.getFullYear()}.${today.getMonth() + 1}.${today.getDate()}`.substring(2)
         const bumpedPatchVersion = !patchVersion || (calVersion != currentCalVersion) ? 0 :  Number(patchVersion) + 1
         const version = calVersion + '-' + bumpedPatchVersion
         let currentBranch = /refs\/[a-zA-Z]+\/(.*)/.exec(process.env.GITHUB_REF)[1]

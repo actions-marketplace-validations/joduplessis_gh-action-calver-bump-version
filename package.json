@@ -1,13 +1,13 @@
 {
   "name": "gh-action-calver-bump-version",
-  "version": "21.6.12-1",
+  "version": "22.3.1-0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/joduplessis/gh-action-calver-bump-version.git"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/joduplessis/gh-action-calver-bump-version/issues"
   },
