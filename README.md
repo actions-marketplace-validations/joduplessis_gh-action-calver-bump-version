@@ -55,4 +55,4 @@ GitHub Action for automated CalVer version bumps for NPM.
     commit-message: 'Version bump to {{version}}'
 ```
 
-Adapted from the excellent [Automated NPM CalVer version bump](https://github.com/marketplace/actions/automated-npm-calver-version-bump)
+Adapted from the excellent [Automated Version Bump](https://github.com/marketplace/actions/automated-version-bump)
